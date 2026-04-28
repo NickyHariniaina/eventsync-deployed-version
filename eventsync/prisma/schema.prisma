@@ -1,0 +1,124 @@
+generator client {
+  provider  = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id            String    @id @default(cuid())
+  userId        String
+  accountId     String
+  providerId    String
+  accessToken   String?
+  refreshToken  String?
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  sessions    TalkSession[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Room {
+  id       String        @id @default(cuid())
+  name     String
+  sessions TalkSession[]
+}
+
+model TalkSession {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  capacity    Int?
+  event       Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId     String
+  room        Room             @relation(fields: [roomId], references: [id])
+  roomId      String
+  speakers    SessionSpeaker[]
+  questions   Question[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model SessionSpeaker {
+  session   TalkSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+  speaker   Speaker     @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  speakerId String
+
+  @@id([sessionId, speakerId])
+}
+
+model Speaker {
+  id       String           @id @default(cuid())
+  name     String
+  photo    String?
+  bio      String?
+  links    SpeakerLink[]
+  sessions SessionSpeaker[]
+}
+
+model SpeakerLink {
+  id        String  @id @default(cuid())
+  label     String
+  url       String
+  speaker   Speaker @relation(fields: [speakerId], references: [id], onDelete: Cascade)
+  speakerId String
+}
+
+model Question {
+  id        String      @id @default(cuid())
+  content   String
+  author    String?
+  upvotes   Int         @default(0)
+  session   TalkSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+  createdAt DateTime    @default(now())
+}
