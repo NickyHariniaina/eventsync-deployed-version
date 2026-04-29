@@ -10,6 +10,23 @@ export async function getQuestions(sessionId: string) {
   return questions
 }
 
+export async function upvoteQuestion(questionId: string) {
+  const question = await prisma.question.findUnique({
+    where: { id: questionId },
+  })
+
+  if (!question) {
+    throw new Error("Question not found")
+  }
+
+  const updated = await prisma.question.update({
+    where: { id: questionId },
+    data: { upvotes: question.upvotes + 1 },
+  })
+
+  return updated
+}
+
 export async function createQuestion(
   sessionId: string,
   input: CreateQuestionDto,
