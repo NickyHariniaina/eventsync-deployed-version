@@ -1,0 +1,486 @@
+openapi: 3.0.3
+info:
+  title: EventSync API
+  description: API for managing events, sessions, speakers, and Q&A for the EventSync platform
+  version: 1.0.0
+  contact:
+    name: EventSync Team
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+
+paths:
+  /api/events:
+    get:
+      summary: List all events
+      description: Returns all events ordered by start date ascending
+      tags: [Events]
+      responses:
+        '200':
+          $ref: '#/components/responses/EventListSuccess'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new event
+      description: Creates a new event (requires authentication)
+      tags: [Events]
+      security:
+        - sessionAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/EventCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/EventCreateSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/events/{id}:
+    get:
+      summary: Get a single event
+      description: Returns an event by ID including its sessions
+      tags: [Events]
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventSuccess'
+        '404':
+          $ref: '#/components/responses/EventNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update an event
+      description: Updates an existing event by ID (requires authentication)
+      tags: [Events]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+      requestBody:
+        $ref: '#/components/requestBodies/EventUpdate'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/EventNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete an event
+      description: Deletes an event by ID (requires authentication)
+      tags: [Events]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeleteSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/sessions/{id}/questions:
+    get:
+      summary: List questions for a session
+      description: Returns all questions for a session ordered by upvotes descending
+      tags: [Questions]
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/QuestionListSuccess'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a question for a session
+      description: Creates a new question for a session (session must be live)
+      tags: [Questions]
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      requestBody:
+        $ref: '#/components/requestBodies/QuestionCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/QuestionCreateSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/SessionNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/questions/{id}/upvote:
+    patch:
+      summary: Upvote a question
+      description: Increments the upvote count for a question
+      tags: [Questions]
+      parameters:
+        - $ref: '#/components/parameters/questionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/QuestionSuccess'
+        '404':
+          $ref: '#/components/responses/QuestionNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Event:
+      type: object
+      required: [id, title, startDate, endDate, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          description: Unique identifier (cuid)
+          example: "ck9x8v7b30000q0d8e1f2g3h4"
+        title:
+          type: string
+          description: Event title
+          example: "Tech Conference 2025"
+        description:
+          type: string
+          nullable: true
+          description: Event description
+          example: "Annual tech conference"
+        startDate:
+          type: string
+          format: date-time
+          description: Event start date
+          example: "2025-09-01T00:00:00.000Z"
+        endDate:
+          type: string
+          format: date-time
+          description: Event end date
+          example: "2025-09-03T23:59:59.000Z"
+        location:
+          type: string
+          nullable: true
+          description: Event location
+          example: "Paris"
+        sessions:
+          type: array
+          description: Associated talk sessions
+          items:
+            $ref: '#/components/schemas/TalkSession'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    EventInput:
+      type: object
+      required: [title, startDate, endDate]
+      properties:
+        title:
+          type: string
+          description: Event title
+          example: "New Conference"
+        description:
+          type: string
+          description: Event description
+          example: "A great event"
+        startDate:
+          type: string
+          format: date
+          description: Event start date (YYYY-MM-DD)
+          example: "2025-09-01"
+        endDate:
+          type: string
+          format: date
+          description: Event end date (YYYY-MM-DD)
+          example: "2025-09-03"
+        location:
+          type: string
+          description: Event location
+          example: "Paris"
+
+    TalkSession:
+      type: object
+      required: [id, title, startTime, endTime, eventId, roomId, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          description: Unique identifier (cuid)
+        title:
+          type: string
+          description: Session title
+        description:
+          type: string
+          nullable: true
+          description: Session description
+        startTime:
+          type: string
+          format: date-time
+          description: Session start time
+        endTime:
+          type: string
+          format: date-time
+          description: Session end time
+        capacity:
+          type: integer
+          nullable: true
+          description: Session capacity
+        eventId:
+          type: string
+          description: Associated event ID
+        roomId:
+          type: string
+          description: Associated room ID
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Question:
+      type: object
+      required: [id, content, upvotes, sessionId, createdAt]
+      properties:
+        id:
+          type: string
+          description: Unique identifier (cuid)
+          example: "q-123"
+        content:
+          type: string
+          description: Question content
+          example: "When does this session end?"
+        author:
+          type: string
+          nullable: true
+          description: Question author name
+          example: "Anonymous"
+        upvotes:
+          type: integer
+          description: Number of upvotes
+          example: 5
+        sessionId:
+          type: string
+          description: Associated session ID
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2026-04-29T10:00:00.000Z"
+
+    QuestionInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          description: Question content (cannot be empty)
+          example: "When does this session end?"
+        author:
+          type: string
+          description: Question author name (optional)
+          example: "Anonymous"
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Internal server error"
+        message:
+          type: string
+          description: Success or informational message
+          example: "Événement supprimé"
+
+  parameters:
+    eventId:
+      name: id
+      in: path
+      required: true
+      description: Event unique identifier
+      schema:
+        type: string
+        example: "ck9x8v7b30000q0d8e1f2g3h4"
+
+    sessionId:
+      name: id
+      in: path
+      required: true
+      description: Session unique identifier
+      schema:
+        type: string
+        example: "session-123"
+
+    questionId:
+      name: id
+      in: path
+      required: true
+      description: Question unique identifier
+      schema:
+        type: string
+        example: "q-123"
+
+  requestBodies:
+    EventCreate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventInput'
+
+    EventUpdate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventInput'
+
+    QuestionCreate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QuestionInput'
+
+  responses:
+    EventListSuccess:
+      description: List of events retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Event'
+
+    EventSuccess:
+      description: Event retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Event'
+
+    EventCreateSuccess:
+      description: Event created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Event'
+
+    QuestionListSuccess:
+      description: List of questions retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Question'
+
+    QuestionSuccess:
+      description: Question retrieved/updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Question'
+
+    QuestionCreateSuccess:
+      description: Question created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Question'
+
+    DeleteSuccess:
+      description: Resource deleted successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Événement supprimé"
+
+    UnauthorizedError:
+      description: User is not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Non autorisé"
+
+    EventNotFoundError:
+      description: Event not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Événement non trouvé"
+
+    SessionNotFoundError:
+      description: Session not found or not live
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            notFound:
+              value:
+                error: "Session not found"
+            notLive:
+              value:
+                error: "Session is not live"
+
+    QuestionNotFoundError:
+      description: Question not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Question not found"
+
+    BadRequestError:
+      description: Invalid request body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            emptyContent:
+              value:
+                error: "Question cannot be empty"
+            missingContent:
+              value:
+                error: "Invalid request body"
+
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Internal server error"
+
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session_token
+      description: Better Auth session token (sent as cookie or Authorization header)
