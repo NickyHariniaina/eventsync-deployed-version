@@ -3,10 +3,17 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 
 export async function GET() {
-  const events = await prisma.event.findMany({
-    orderBy: { startDate: "asc" }
-  })
-  return NextResponse.json(events)
+  try {
+    const events = await prisma.event.findMany({
+      orderBy: { startDate: "asc" }
+    })
+    return NextResponse.json(events)
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -17,15 +24,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
   }
 
-  const body = await request.json()
-  const event = await prisma.event.create({
-    data: {
-      title: body.title,
-      description: body.description,
-      startDate: new Date(body.startDate),
-      endDate: new Date(body.endDate),
-      location: body.location,
-    }
-  })
-  return NextResponse.json(event, { status: 201 })
+  try {
+    const body = await request.json()
+    const event = await prisma.event.create({
+      data: {
+        title: body.title,
+        description: body.description,
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
+        location: body.location,
+      }
+    })
+    return NextResponse.json(event, { status: 201 })
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }

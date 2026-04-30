@@ -6,14 +6,21 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const event = await prisma.event.findUnique({
-    where: { id: params.id },
-    include: { sessions: true }
-  })
-  if (!event) {
-    return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 })
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: params.id },
+      include: { sessions: true }
+    })
+    if (!event) {
+      return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 })
+    }
+    return NextResponse.json(event)
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
   }
-  return NextResponse.json(event)
 }
 
 export async function PUT(
@@ -27,18 +34,25 @@ export async function PUT(
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
   }
 
-  const body = await request.json()
-  const event = await prisma.event.update({
-    where: { id: params.id },
-    data: {
-      title: body.title,
-      description: body.description,
-      startDate: new Date(body.startDate),
-      endDate: new Date(body.endDate),
-      location: body.location,
-    }
-  })
-  return NextResponse.json(event)
+  try {
+    const body = await request.json()
+    const event = await prisma.event.update({
+      where: { id: params.id },
+      data: {
+        title: body.title,
+        description: body.description,
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
+        location: body.location,
+      }
+    })
+    return NextResponse.json(event)
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }
 
 export async function DELETE(
@@ -52,8 +66,15 @@ export async function DELETE(
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
   }
 
-  await prisma.event.delete({
-    where: { id: params.id }
-  })
-  return NextResponse.json({ message: "Événement supprimé" })
+  try {
+    await prisma.event.delete({
+      where: { id: params.id }
+    })
+    return NextResponse.json({ message: "Événement supprimé" })
+  } catch {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
 }
