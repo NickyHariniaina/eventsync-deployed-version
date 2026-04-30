@@ -6,3 +6,37 @@ export type Question = {
   sessionId: string
   createdAt: Date
 }
+
+export type Speaker = {
+  id: string
+  name: string
+  photo: string | null
+  bio: string | null
+}
+
+export type Session = {
+  id: string
+  title: string
+  description: string | null
+  startTime: Date
+  endTime: Date
+  capacity: number | null
+  eventId: string
+  roomId: string
+  roomName: string
+  speakers: Speaker[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type Event = {
+  id: string
+  title: string
+  description: string | null
+  startDate: Date
+  endDate: Date
+  location: string | null
+  sessions?: Session[]
+  createdAt: Date
+  updatedAt: Date
+}

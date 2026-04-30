@@ -1,3 +1,18 @@
+export function mockEvent(overrides: Partial<MockEvent> = {}): MockEvent {
+  const now = new Date()
+  return {
+    id: "event-default",
+    title: "Test Event",
+    description: null,
+    startDate: new Date(now.getTime() - 86400000),
+    endDate: new Date(now.getTime() + 86400000),
+    location: "Test Location",
+    createdAt: now,
+    updatedAt: now,
+    ...overrides,
+  }
+}
+
 export function mockSession(overrides: Partial<MockSession> = {}): MockSession {
   const now = new Date()
   return {
@@ -25,6 +40,17 @@ export function mockQuestion(overrides: Partial<MockQuestion> = {}): MockQuestio
     createdAt: new Date(),
     ...overrides,
   }
+}
+
+export type MockEvent = {
+  id: string
+  title: string
+  description: string | null
+  startDate: Date
+  endDate: Date
+  location: string | null
+  createdAt: Date
+  updatedAt: Date
 }
 
 export type MockSession = {
