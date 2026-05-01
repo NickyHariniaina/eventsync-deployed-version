@@ -5,7 +5,10 @@ import { auth } from "@/lib/auth"
 export async function GET() {
   try {
     const events = await prisma.event.findMany({
-      orderBy: { startDate: "asc" }
+      orderBy: { startDate: "asc" },
+      include: {
+        sessions: { select: { id: true } }
+      }
     })
     return NextResponse.json(events)
   } catch {

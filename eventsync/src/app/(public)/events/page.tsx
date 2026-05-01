@@ -1,65 +1,89 @@
-import { EventCard } from "@/components/events/event-card"
+"use client"
 
-const mockEvents = [
-  {
-    id: "1",
-    title: "Tech Conference 2025",
-    startDate: new Date("2025-06-15T09:00:00Z"),
-    endDate: new Date("2025-06-17T18:00:00Z"),
-    location: "Paris Convention Center",
-    sessionCount: 24,
-  },
-  {
-    id: "2",
-    title: "Web3 Summit",
-    startDate: new Date("2025-09-01T10:00:00Z"),
-    endDate: new Date("2025-09-03T17:00:00Z"),
-    location: "Berlin Arena",
-    sessionCount: 18,
-  },
-  {
-    id: "3",
-    title: "AI & ML Workshop",
-    startDate: new Date("2025-03-20T08:30:00Z"),
-    endDate: new Date("2025-03-20T16:00:00Z"),
-    location: "London Tech Hub",
-    sessionCount: 6,
-  },
-  {
-    id: "4",
-    title: "Startup Pitch Day",
-    startDate: new Date("2025-07-10T11:00:00Z"),
-    endDate: new Date("2025-07-10T18:00:00Z"),
-    location: "San Francisco Innovation Hub",
-    sessionCount: 12,
-  },
-  {
-    id: "5",
-    title: "Design Thinking Bootcamp",
-    startDate: new Date("2025-08-21T09:00:00Z"),
-    endDate: new Date("2025-08-22T16:30:00Z"),
-    location: "Amsterdam Creative Space",
-    sessionCount: 9,
-  },
-  {
-    id: "6",
-    title: "Healthcare Tech Expo",
-    startDate: new Date("2025-11-02T10:00:00Z"),
-    endDate: new Date("2025-11-04T17:00:00Z"),
-    location: "Tokyo International Forum",
-    sessionCount: 21,
-  },
-]
+import { useEffect, useState } from "react"
+import { EventCard } from "@/components/events/event-card"
+import { EventCardSkeleton } from "@/components/events/event-card-skeleton"
+
+interface ApiEvent {
+  id: string
+  title: string
+  description: string | null
+  startDate: string
+  endDate: string
+  location: string | null
+  sessions: { id: string }[]
+}
 
 export default function EventsPage() {
+  const [events, setEvents] = useState<ApiEvent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await fetch("/api/events")
+        if (!response.ok) {
+          throw new Error("Failed to fetch events")
+        }
+        const data = await response.json()
+        setEvents(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchEvents()
+  }, [])
+
+  const eventsWithSessionCount = events.map((event) => ({
+    ...event,
+    sessionCount: event.sessions?.length ?? 0,
+  }))
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-3xl font-bold tracking-tight mb-6">Events</h1>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {mockEvents.map((event) => (
-          <EventCard key={event.id} {...event} />
-        ))}
-      </div>
+      {error && (
+        <div className="text-center py-8">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+      {isLoading && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <EventCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+      {!isLoading && !error && eventsWithSessionCount.length === 0 && (
+        <p className="text-center text-muted-foreground py-8">
+          No events available
+        </p>
+      )}
+      {!isLoading && !error && eventsWithSessionCount.length > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {eventsWithSessionCount.map((event) => (
+            <EventCard
+              key={event.id}
+              id={event.id}
+              title={event.title}
+              startDate={new Date(event.startDate)}
+              endDate={new Date(event.endDate)}
+              location={event.location}
+              sessionCount={event.sessionCount}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -9,6 +9,7 @@ export function mockEvent(overrides: Partial<MockEvent> = {}): MockEvent {
     location: "Test Location",
     createdAt: now,
     updatedAt: now,
+    sessions: [],
     ...overrides,
   }
 }
@@ -51,6 +52,7 @@ export type MockEvent = {
   location: string | null
   createdAt: Date
   updatedAt: Date
+  sessions: { id: string }[]
 }
 
 export type MockSession = {

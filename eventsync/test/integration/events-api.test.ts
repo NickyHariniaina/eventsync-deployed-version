@@ -43,7 +43,34 @@ describe("GET /api/events", () => {
     expect(data).toHaveLength(2)
     expect(prisma.event.findMany).toHaveBeenCalledWith({
       orderBy: { startDate: "asc" },
+      include: {
+        sessions: { select: { id: true } },
+      },
     })
+  })
+
+  it("should return events with sessions", async () => {
+    const events = [
+      mockEvent({
+        id: "e-1",
+        title: "Tech Conference",
+        sessions: [{ id: "s-1" }, { id: "s-2" }, { id: "s-3" }],
+      }),
+      mockEvent({
+        id: "e-2",
+        title: "Workshop",
+        sessions: [{ id: "s-4" }],
+      }),
+    ]
+    vi.mocked(prisma.event.findMany).mockResolvedValue(events)
+
+    const response = await GET()
+
+    expect(response.status).toBe(200)
+    const data = await response.json()
+    expect(data).toHaveLength(2)
+    expect(data[0].sessions).toHaveLength(3)
+    expect(data[1].sessions).toHaveLength(1)
   })
 
   it("should return empty array when no events exist", async () => {
