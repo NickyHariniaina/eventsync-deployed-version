@@ -33,8 +33,32 @@ describe("GET /api/events/[id]", () => {
     vi.mocked(prisma.event.findUnique).mockResolvedValue({
       ...mockEvent({ id: "e-123", title: "Tech Conference" }),
       sessions: [
-        { id: "s-1", title: "Opening Keynote", eventId: "e-123" },
-        { id: "s-2", title: "Closing Remarks", eventId: "e-123" },
+        {
+          id: "s-1",
+          title: "Opening Keynote",
+          description: null,
+          startTime: new Date(),
+          endTime: new Date(),
+          capacity: null,
+          eventId: "e-123",
+          roomId: "room-1",
+          room: { id: "room-1", name: "Main Hall" },
+          speakers: [
+            { sessionId: "s-1", speakerId: "sp-1", speaker: { id: "sp-1", name: "John Doe", photo: null, bio: null } }
+          ],
+        },
+        {
+          id: "s-2",
+          title: "Closing Remarks",
+          description: null,
+          startTime: new Date(),
+          endTime: new Date(),
+          capacity: null,
+          eventId: "e-123",
+          roomId: "room-1",
+          room: { id: "room-1", name: "Main Hall" },
+          speakers: [],
+        },
       ],
     })
 
@@ -49,7 +73,18 @@ describe("GET /api/events/[id]", () => {
     expect(data.sessions).toHaveLength(2)
     expect(prisma.event.findUnique).toHaveBeenCalledWith({
       where: { id: "e-123" },
-      include: { sessions: true },
+      include: {
+        sessions: {
+          include: {
+            room: true,
+            speakers: {
+              include: {
+                speaker: true
+              }
+            }
+          }
+        }
+      },
     })
   })
 

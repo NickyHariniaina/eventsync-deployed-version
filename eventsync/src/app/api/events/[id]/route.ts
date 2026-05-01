@@ -4,12 +4,24 @@ import { auth } from "@/lib/auth"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
-      include: { sessions: true }
+      where: { id },
+      include: {
+        sessions: {
+          include: {
+            room: true,
+            speakers: {
+              include: {
+                speaker: true
+              }
+            }
+          }
+        }
+      }
     })
     if (!event) {
       return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 })
@@ -25,7 +37,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth.api.getSession({
     headers: request.headers
@@ -35,9 +47,10 @@ export async function PUT(
   }
 
   try {
+    const { id } = await params
     const body = await request.json()
     const event = await prisma.event.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title: body.title,
         description: body.description,
@@ -57,7 +70,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth.api.getSession({
     headers: request.headers
@@ -67,8 +80,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params
     await prisma.event.delete({
-      where: { id: params.id }
+      where: { id }
     })
     return NextResponse.json({ message: "Événement supprimé" })
   } catch {
