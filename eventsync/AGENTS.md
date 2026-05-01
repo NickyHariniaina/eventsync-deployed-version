@@ -9,10 +9,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ```
 pnpm dev              # Start dev server (Turbopack)
 pnpm build            # Production build
-pnpm test             # Run all Vitest tests
+pnpm start            # Start production server
+pnpm test             # Run all Vitest tests (unit + integration)
 pnpm test -t "name"   # Run tests matching pattern
 pnpm lint             # ESLint
+pnpm seed             # Seed database with prisma/seed.ts
 ```
+
+**Test projects:** `vitest.config.ts` defines two projects — `unit` and `integration`.
 
 ## Critical Architecture Notes
 
@@ -71,3 +75,7 @@ describe("...", () => {
 | D | Q&A system, Event public pages (list + detail) |
 
 Do not modify another person's routes/pages without coordination. See `docs/generated_structure.md` for full breakdown.
+
+## Library Docs
+
+Use the `find-docs` skill for any library, framework, or API questions — including well-known ones like Next.js, Prisma, Zod, React, etc. APIs change frequently; always verify against current docs.
