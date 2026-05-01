@@ -9,8 +9,39 @@ servers:
   - url: http://localhost:3000
     description: Local development server
 
+tags:
+  - name: Events
+    description: Event management
+  - name: Sessions
+    description: Session management
+  - name: Speakers
+    description: Speaker management
+  - name: Questions
+    description: Q&A for sessions
+  - name: Auth
+    description: Authentication endpoints
 
 paths:
+  # Auth
+  /api/auth/{all}:
+    post:
+      summary: Better Auth handler
+      description: Catches all auth routes (signIn, signOut, callback, etc.)
+      tags: [Auth]
+      parameters:
+        - name: all
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Auth path segments (signIn, signOut, callback, etc.)
+      responses:
+        '200':
+          description: Auth response
+        '302':
+          description: Redirect to auth provider or callback
+
+  # Events
   /api/events:
     get:
       summary: List all events
@@ -132,6 +163,156 @@ paths:
           $ref: '#/components/responses/QuestionSuccess'
         '404':
           $ref: '#/components/responses/QuestionNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Sessions
+  /api/sessions:
+    get:
+      summary: List all sessions
+      description: Returns all sessions (not implemented)
+      tags: [Sessions]
+      responses:
+        '200':
+          description: List of sessions
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new session
+      description: Creates a new session (requires authentication)
+      tags: [Sessions]
+      security:
+        - sessionAuth: []
+      responses:
+        '201':
+          description: Session created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/sessions/{id}:
+    get:
+      summary: Get a single session
+      description: Returns a session by ID (not implemented)
+      tags: [Sessions]
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: Session retrieved successfully
+        '404':
+          $ref: '#/components/responses/SessionNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update a session
+      description: Updates a session by ID (requires authentication)
+      tags: [Sessions]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: Session updated successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/SessionNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete a session
+      description: Deletes a session by ID (requires authentication)
+      tags: [Sessions]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeleteSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Speakers
+  /api/speakers:
+    get:
+      summary: List all speakers
+      description: Returns all speakers (not implemented)
+      tags: [Speakers]
+      responses:
+        '200':
+          description: List of speakers
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new speaker
+      description: Creates a new speaker (requires authentication)
+      tags: [Speakers]
+      security:
+        - sessionAuth: []
+      responses:
+        '201':
+          description: Speaker created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/speakers/{id}:
+    get:
+      summary: Get a single speaker
+      description: Returns a speaker by ID (not implemented)
+      tags: [Speakers]
+      parameters:
+        - $ref: '#/components/parameters/speakerId'
+      responses:
+        '200':
+          description: Speaker retrieved successfully
+        '404':
+          $ref: '#/components/responses/SpeakerNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update a speaker
+      description: Updates a speaker by ID (requires authentication)
+      tags: [Speakers]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/speakerId'
+      responses:
+        '200':
+          description: Speaker updated successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/SpeakerNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete a speaker
+      description: Deletes a speaker by ID (requires authentication)
+      tags: [Speakers]
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/speakerId'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeleteSuccess'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -334,6 +515,15 @@ components:
         type: string
         example: "q-123"
 
+    speakerId:
+      name: id
+      in: path
+      required: true
+      description: Speaker unique identifier
+      schema:
+        type: string
+        example: "sp-123"
+
   requestBodies:
     EventCreate:
       required: true
@@ -454,6 +644,24 @@ components:
             $ref: '#/components/schemas/Error'
           example:
             error: "Question not found"
+
+    SessionNotFoundErrorForSpeaker:
+      description: Session not found (duplicate - for reference)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Session not found"
+
+    SpeakerNotFoundError:
+      description: Speaker not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Speaker not found"
 
     BadRequestError:
       description: Invalid request body
