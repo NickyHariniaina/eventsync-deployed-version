@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import { prisma } from "@/lib/prisma"
 import { SessionDetail } from "@/components/sessions/SessionDetail"
 
 type Props = {
@@ -9,41 +8,21 @@ type Props = {
 export default async function SessionPage({ params }: Props) {
     const { id } = await params
 
-    const session = await prisma.talkSession.findUnique({
-        where: { id },
-        include: {
-            room: true,
-            speakers: {
-                include: { speaker: true },
-            },
-            questions: {
-                orderBy: { upvotes: "desc" },
-            },
-        },
-    })
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/sessions/${id}`,
+        {
+            cache: "no-store",
+        }
+    )
 
-    if (!session) notFound()
+    if (res.status === 404) notFound()
+    if (!res.ok) throw new Error("Erreur lors de la récupération de la session")
 
-    const sessionData = {
-        id: session.id,
-        title: session.title,
-        description: session.description,
-        startTime: session.startTime,
-        endTime: session.endTime,
-        capacity: session.capacity,
-        roomId: session.roomId,
-        roomName: session.room.name,
-        speakers: session.speakers.map((ss) => ({
-            id: ss.speaker.id,
-            name: ss.speaker.name,
-            photo: ss.speaker.photo,
-            bio: ss.speaker.bio,
-        })),
-    }
+    const session = await res.json()
 
     return (
         <main className="mx-auto max-w-3xl px-4 py-8">
-            <SessionDetail session={sessionData} />
+            <SessionDetail session={session} />
 
             {/*
                 TODO Personne D — brancher ici quand feat/questions est mergé :
