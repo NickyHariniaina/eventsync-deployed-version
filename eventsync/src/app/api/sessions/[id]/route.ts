@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
+import { updateSessionSchema } from "@/lib/validators"
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -66,7 +67,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
         const { id } = await params
         const body = await req.json()
-        const { title, description, startTime, endTime, capacity, roomId, speakerIds } = body
+        const parsed = updateSessionSchema.safeParse(body)
+        if (!parsed.success) {
+            return NextResponse.json(
+                { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+                { status: 400 }
+            )
+        }
+
+        const { title, description, startTime, endTime, capacity, roomId, speakerIds } = parsed.data
 
         const existing = await prisma.talkSession.findUnique({ where: { id } })
         if (!existing) {

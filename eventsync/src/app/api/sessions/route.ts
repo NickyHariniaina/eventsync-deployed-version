@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
+import { createSessionSchema } from "@/lib/validators"
 
 export async function GET() {
     try {
@@ -54,14 +55,15 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { title, description, startTime, endTime, capacity, eventId, roomId, speakerIds } = body
-
-        if (!title || !startTime || !endTime || !eventId || !roomId) {
+        const parsed = createSessionSchema.safeParse(body)
+        if (!parsed.success) {
             return NextResponse.json(
-                { error: "Champs requis manquants : title, startTime, endTime, eventId, roomId" },
+                { error: parsed.error.issues[0]?.message ?? "Invalid request" },
                 { status: 400 }
             )
         }
+
+        const { title, description, startTime, endTime, capacity, eventId, roomId, speakerIds } = parsed.data
 
         const newSession = await prisma.talkSession.create({
             data: {

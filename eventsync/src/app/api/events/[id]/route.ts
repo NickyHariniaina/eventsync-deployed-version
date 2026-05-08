@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { createEventSchema } from "@/lib/validators"
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +9,6 @@ export async function GET(
 ) {
   const { id } = await params
   try {
-    const { id } = await params
     const event = await prisma.event.findUnique({
       where: { id },
       include: {
@@ -49,16 +49,22 @@ export async function PUT(
   }
 
   try {
-    const { id } = await params
     const body = await request.json()
+    const parsed = createEventSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 }
+      )
+    }
     const event = await prisma.event.update({
       where: { id },
       data: {
-        title: body.title,
-        description: body.description,
-        startDate: new Date(body.startDate),
-        endDate: new Date(body.endDate),
-        location: body.location,
+        title: parsed.data.title,
+        description: parsed.data.description,
+        startDate: new Date(parsed.data.startDate),
+        endDate: new Date(parsed.data.endDate),
+        location: parsed.data.location,
       }
     })
     return NextResponse.json(event)
@@ -83,7 +89,6 @@ export async function DELETE(
   }
 
   try {
-    const { id } = await params
     await prisma.event.delete({
       where: { id }
     })
