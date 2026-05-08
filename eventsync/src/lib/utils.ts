@@ -12,3 +12,11 @@ export function formatDate(date: Date): string {
     year: "numeric",
   }).format(date)
 }
+
+export function isSessionLive(
+    startTime: Date | string,
+    endTime: Date | string
+): boolean {
+    const now = new Date()
+    return now >= new Date(startTime) && now <= new Date(endTime)
+}
