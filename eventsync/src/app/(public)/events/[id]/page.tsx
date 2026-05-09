@@ -6,8 +6,7 @@ import { useParams } from "next/navigation"
 import { ArrowLeft, Calendar, MapPin } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-import { SessionCard } from "@/components/events/session-card"
-import { EventDetailSkeleton } from "@/components/events/event-detail-skeleton"
+import { TimelineSessionCard } from "@/components/events/timeline-session-card"
 
 interface ApiSession {
   id: string
@@ -65,7 +64,16 @@ export default function EventDetailPage() {
   }, [eventId])
 
   if (isLoading) {
-    return <EventDetailSkeleton />
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="mx-auto mt-20 max-w-sm flex flex-col items-center gap-2">
+          <span className="text-sm font-medium">Chargement de l&apos;événement...</span>
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-1/3 rounded-full bg-primary progress-sweep" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
@@ -154,9 +162,9 @@ export default function EventDetailPage() {
           Sessions ({sessionsWithDetails.length})
         </h2>
         {sessionsWithDetails.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="relative">
             {sessionsWithDetails.map((session) => (
-              <SessionCard key={session.id} {...session} />
+              <TimelineSessionCard key={session.id} {...session} />
             ))}
           </div>
         ) : (
