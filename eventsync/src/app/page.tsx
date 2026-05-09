@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
+import { HeroText } from "@/components/hero-text"
 
 export default function Home() {
   return (
@@ -22,10 +23,9 @@ export default function Home() {
           <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
             EventSync
           </h1>
-          <p className="text-lg text-muted-foreground max-w-lg">
-            Plateforme de gestion d&apos;événements et d&apos;engagement des
-            participants en temps réel
-          </p>
+          <div className="text-lg text-foreground max-w-lg h-14 sm:h-10">
+            <HeroText />
+          </div>
           <Link
             href="/events"
             className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:opacity-80"
