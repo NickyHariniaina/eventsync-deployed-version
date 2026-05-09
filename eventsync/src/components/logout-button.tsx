@@ -9,7 +9,7 @@ export default function LogoutButton() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/events")
+          router.push("/login")
         }
       }
     })
