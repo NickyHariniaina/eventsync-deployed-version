@@ -140,4 +140,22 @@
   }
 }
 
+@keyframes sunset-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.sunset-btn {
+  background: linear-gradient(135deg, #a33b20 0%, #a33b20 20%, #c2532a 40%, #d4764a 60%, #a47963 80%, #8c3b24 100%);
+  background-size: 300% 300%;
+  background-position: 0% 50%;
+  transition: all 0.5s ease;
+}
+
+.sunset-btn:hover {
+  background-position: 100% 50%;
+  animation: sunset-shift 0.7s ease-in-out infinite;
+}
+
 

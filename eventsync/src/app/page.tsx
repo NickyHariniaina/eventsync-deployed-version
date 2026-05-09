@@ -28,7 +28,7 @@ export default function Home() {
           </div>
           <Link
             href="/events"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:opacity-80"
+            className="sunset-btn inline-flex h-10 items-center justify-center rounded-lg px-6 text-sm font-medium text-white transition-all duration-700 hover:scale-105 hover:shadow-lg hover:shadow-[#a33b20]/30"
           >
             Explorer les événements
           </Link>
