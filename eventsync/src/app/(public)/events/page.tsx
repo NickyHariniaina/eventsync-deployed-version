@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Search, X } from "lucide-react"
 import { EventCard } from "@/components/events/event-card"
-import { EventCardSkeleton } from "@/components/events/event-card-skeleton"
 
 interface ApiEvent {
   id: string
@@ -101,10 +100,11 @@ export default function EventsPage() {
         </div>
       )}
       {isLoading && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <EventCardSkeleton key={i} />
-          ))}
+        <div className="mx-auto mt-20 max-w-sm flex flex-col items-center gap-2">
+          <span className="text-sm font-medium">Chargement des événements...</span>
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-1/3 rounded-full bg-primary progress-sweep" />
+          </div>
         </div>
       )}
       {!isLoading && !error && filtered.length === 0 && (
