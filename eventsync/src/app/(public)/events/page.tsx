@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { Search, X } from "lucide-react"
 import { EventCard } from "@/components/events/event-card"
 import { EventCardSkeleton } from "@/components/events/event-card-skeleton"
 
@@ -18,6 +19,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState<ApiEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState("")
 
   useEffect(() => {
     async function fetchEvents() {
@@ -38,14 +40,55 @@ export default function EventsPage() {
     fetchEvents()
   }, [])
 
-  const eventsWithSessionCount = events.map((event) => ({
-    ...event,
-    sessionCount: event.sessions?.length ?? 0,
-  }))
+  const eventsWithSessionCount = useMemo(
+    () =>
+      events.map((event) => ({
+        ...event,
+        sessionCount: event.sessions?.length ?? 0,
+      })),
+    [events],
+  )
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return eventsWithSessionCount
+    const q = query.toLowerCase()
+    return eventsWithSessionCount.filter(
+      (event) =>
+        event.title.toLowerCase().includes(q) ||
+        (event.location && event.location.toLowerCase().includes(q)),
+    )
+  }, [eventsWithSessionCount, query])
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight mb-6">Events</h1>
+      {/* Search */}
+      <div className="relative mb-8 max-w-md">
+        <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Rechercher un événement..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full rounded-xl border-2 border-border bg-background py-3 pl-11 pr-10 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Events</h1>
+        {query && (
+          <p className="text-sm text-muted-foreground">
+            {filtered.length} résultat{filtered.length !== 1 ? "s" : ""}
+          </p>
+        )}
+      </div>
       {error && (
         <div className="text-center py-8">
           <p className="text-red-500 mb-4">{error}</p>
@@ -64,14 +107,14 @@ export default function EventsPage() {
           ))}
         </div>
       )}
-      {!isLoading && !error && eventsWithSessionCount.length === 0 && (
+      {!isLoading && !error && filtered.length === 0 && (
         <p className="text-center text-muted-foreground py-8">
-          No events available
+          {query ? "Aucun événement trouvé" : "No events available"}
         </p>
       )}
-      {!isLoading && !error && eventsWithSessionCount.length > 0 && (
+      {!isLoading && !error && filtered.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {eventsWithSessionCount.map((event) => (
+          {filtered.map((event) => (
             <EventCard
               key={event.id}
               id={event.id}
