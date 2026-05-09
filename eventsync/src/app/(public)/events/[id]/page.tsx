@@ -6,8 +6,7 @@ import { useParams } from "next/navigation"
 import { ArrowLeft, Calendar, MapPin } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-import { SessionCard } from "@/components/events/session-card"
-import { EventDetailSkeleton } from "@/components/events/event-detail-skeleton"
+import { TimelineSessionCard } from "@/components/events/timeline-session-card"
 
 interface ApiSession {
   id: string
@@ -65,7 +64,16 @@ export default function EventDetailPage() {
   }, [eventId])
 
   if (isLoading) {
-    return <EventDetailSkeleton />
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="mx-auto mt-20 max-w-sm flex flex-col items-center gap-2">
+          <span className="text-sm font-medium">Chargement de l&apos;événement...</span>
+          <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-1/3 rounded-full bg-primary progress-sweep" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
@@ -73,7 +81,7 @@ export default function EventDetailPage() {
       <div className="mx-auto max-w-7xl px-4 py-8">
         <Link
           href="/events"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-foreground/55"
         >
           <ArrowLeft className="size-4" />
           Back to Events
@@ -94,7 +102,7 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <p className="text-center text-muted-foreground">Event not found</p>
+        <p className="text-center text-foreground/50">Event not found</p>
       </div>
     )
   }
@@ -117,7 +125,7 @@ export default function EventDetailPage() {
     <div className="mx-auto max-w-7xl px-4 py-8">
       <Link
         href="/events"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-foreground/55 transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Back to Events
@@ -130,12 +138,12 @@ export default function EventDetailPage() {
         </div>
 
         {event.description && (
-          <p className="text-muted-foreground mb-4 max-w-3xl">
+          <p className="text-foreground/65 mb-4 max-w-3xl">
             {event.description}
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/60">
           <span className="flex items-center gap-1.5">
             <Calendar className="size-4" />
             {formatDate(new Date(event.startDate))} — {formatDate(new Date(event.endDate))}
@@ -154,13 +162,13 @@ export default function EventDetailPage() {
           Sessions ({sessionsWithDetails.length})
         </h2>
         {sessionsWithDetails.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="relative">
             {sessionsWithDetails.map((session) => (
-              <SessionCard key={session.id} {...session} />
+              <TimelineSessionCard key={session.id} {...session} />
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No sessions scheduled yet.</p>
+          <p className="text-foreground/50">No sessions scheduled yet.</p>
         )}
       </div>
     </div>

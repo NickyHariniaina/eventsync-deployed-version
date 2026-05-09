@@ -8,25 +8,10 @@ export type Question = {
 }
 
 export type Speaker = {
-    id: string
-    name: string
-    photo: string | null
-    bio: string | null
-    links?: SpeakerLink[]
-}
-export type SpeakerLink = {
-    id: string
-    label: string
-    url: string
-}
-
-export type SerializedSession = {
-    id: string
-    title: string
-    startTime: string
-    endTime: string
-    room: string
-    eventTitle: string
+  id: string
+  name: string
+  photo: string | null
+  bio: string | null
 }
 
 export type Session = {

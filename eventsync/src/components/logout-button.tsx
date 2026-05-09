@@ -1,26 +1,20 @@
 "use client"
-import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 
-export default function LogoutButton() {
+export function LogoutButton() {
   const router = useRouter()
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/login")
-        }
-      }
-    })
+    await fetch("/api/auth/sign-out", { method: "POST" })
+    router.push("/events")
   }
 
   return (
     <button
       onClick={handleLogout}
-      className="w-full p-2 text-left rounded hover:bg-gray-700 text-red-400"
+      className="mt-4 w-full text-left p-2 rounded hover:bg-gray-700 cursor-pointer"
     >
-      Se déconnecter
+      Déconnexion
     </button>
   )
 }
