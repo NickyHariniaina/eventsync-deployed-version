@@ -9,16 +9,6 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
         const room = await prisma.room.findUnique({
             where: { id },
-            include: {
-                sessions: {
-                    orderBy: { startTime: "asc" },
-                    include: {
-                        speakers: {
-                            include: { speaker: true },
-                        },
-                    },
-                },
-            },
         })
 
         if (!room) {
@@ -28,10 +18,20 @@ export async function GET(_req: NextRequest, { params }: Params) {
             )
         }
 
+        const sessions = await prisma.talkSession.findMany({
+            where: { roomId: id },
+            orderBy: { startTime: "asc" },
+            include: {
+                speakers: {
+                    include: { speaker: true },
+                },
+            },
+        })
+
         return NextResponse.json({
             id: room.id,
             name: room.name,
-            sessions: room.sessions.map((s) => ({
+            sessions: sessions.map((s) => ({
                 id: s.id,
                 title: s.title,
                 description: s.description,
