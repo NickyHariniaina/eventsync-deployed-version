@@ -73,7 +73,7 @@ export default function EventDetailPage() {
       <div className="mx-auto max-w-7xl px-4 py-8">
         <Link
           href="/events"
-          className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-foreground/55"
         >
           <ArrowLeft className="size-4" />
           Back to Events
@@ -94,7 +94,7 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <p className="text-center text-muted-foreground">Event not found</p>
+        <p className="text-center text-foreground/50">Event not found</p>
       </div>
     )
   }
@@ -117,7 +117,7 @@ export default function EventDetailPage() {
     <div className="mx-auto max-w-7xl px-4 py-8">
       <Link
         href="/events"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-foreground/55 transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
         Back to Events
@@ -130,12 +130,12 @@ export default function EventDetailPage() {
         </div>
 
         {event.description && (
-          <p className="text-muted-foreground mb-4 max-w-3xl">
+          <p className="text-foreground/65 mb-4 max-w-3xl">
             {event.description}
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/60">
           <span className="flex items-center gap-1.5">
             <Calendar className="size-4" />
             {formatDate(new Date(event.startDate))} — {formatDate(new Date(event.endDate))}
@@ -160,7 +160,7 @@ export default function EventDetailPage() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No sessions scheduled yet.</p>
+          <p className="text-foreground/50">No sessions scheduled yet.</p>
         )}
       </div>
     </div>
