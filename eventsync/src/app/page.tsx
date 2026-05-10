@@ -1,6 +1,9 @@
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/sections/hero-section"
+import { StatsSection } from "@/components/sections/stats-section"
 import { FeatureEvents } from "@/components/sections/feature-events"
+import { FeatureSessions } from "@/components/sections/feature-sessions"
+import { FeatureSpeakers } from "@/components/sections/feature-speakers"
 import { FeatureRooms } from "@/components/sections/feature-rooms"
 import { FeatureSchedule } from "@/components/sections/feature-schedule"
 import { FeatureFavorites } from "@/components/sections/feature-favorites"
@@ -25,7 +28,10 @@ export default function Home() {
       >
         <HeroSection />
         <div className="w-full max-w-6xl pb-24 space-y-28">
+          <StatsSection />
           <FeatureEvents />
+          <FeatureSessions />
+          <FeatureSpeakers />
           <FeatureRooms />
           <FeatureSchedule />
           <FeatureFavorites />
