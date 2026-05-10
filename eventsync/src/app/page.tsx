@@ -1,6 +1,9 @@
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/sections/hero-section"
 import { FeatureEvents } from "@/components/sections/feature-events"
+import { FeatureRooms } from "@/components/sections/feature-rooms"
+import { FeatureSchedule } from "@/components/sections/feature-schedule"
+import { FeatureFavorites } from "@/components/sections/feature-favorites"
 import { CtaSection } from "@/components/sections/cta-section"
 
 export default function Home() {
@@ -23,6 +26,9 @@ export default function Home() {
         <HeroSection />
         <div className="w-full max-w-6xl pb-24 space-y-28">
           <FeatureEvents />
+          <FeatureRooms />
+          <FeatureSchedule />
+          <FeatureFavorites />
           <CtaSection />
         </div>
       </div>
