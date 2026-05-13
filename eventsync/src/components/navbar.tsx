@@ -23,12 +23,6 @@ export function Navbar() {
           >
             Events
           </Link>
-          <Link
-            href="/login"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Login
-          </Link>
         </nav>
         <div className="absolute right-4">
           <ThemeToggle />

@@ -25,9 +25,17 @@ export async function GET(
       }
     })
     if (!event) {
-      return NextResponse.json({ error: "Événement non trouvé" }, { status: 404 })
+      return NextResponse.json(
+        { error: "Événement non trouvé" },
+        { status: 404 }
+      )
     }
-    return NextResponse.json(event)
+    return NextResponse.json(event, {
+      headers: {
+        "Content-Range": `events 0-1/1`,
+        "Access-Control-Expose-Headers": "Content-Range",
+      }
+    })
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

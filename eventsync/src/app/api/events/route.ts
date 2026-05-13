@@ -11,7 +11,12 @@ export async function GET() {
         sessions: { select: { id: true } }
       }
     })
-    return NextResponse.json(events)
+    return NextResponse.json(events, {
+      headers: {
+        "Content-Range": `events 0-${events.length}/${events.length}`,
+        "Access-Control-Expose-Headers": "Content-Range",
+      }
+    })
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },
