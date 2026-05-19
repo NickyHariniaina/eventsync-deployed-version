@@ -49,7 +49,11 @@ export async function GET(_req: NextRequest, { params }: Params) {
             questions: session.questions,
             createdAt: session.createdAt,
             updatedAt: session.updatedAt,
-        })
+        }, {
+    headers: {
+        "Content-Range": "sessions 0-1/1",
+        "Access-Control-Expose-Headers": "Content-Range",
+    }})
     } catch {
         return NextResponse.json(
             { error: "Internal server error" },

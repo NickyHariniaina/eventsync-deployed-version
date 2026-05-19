@@ -37,7 +37,12 @@ export async function GET() {
             updatedAt: s.updatedAt,
         }))
 
-        return NextResponse.json(formatted)
+        return NextResponse.json(formatted, {
+            headers: {
+                "Content-Range": `sessions 0-${formatted.length}/${formatted.length}`,
+                "Access-Control-Expose-Headers": "Content-Range",
+            }
+        })
     } catch {
         return NextResponse.json(
             { error: "Internal server error" },
