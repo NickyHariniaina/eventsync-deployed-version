@@ -7,7 +7,12 @@ export async function GET() {
         orderBy: { name: "asc" },
     })
 
-    return NextResponse.json(speakers)
+    return NextResponse.json(speakers, {
+        headers: {
+            "Content-Range": `speakers 0-${speakers.length}/${speakers.length}`,
+            "Access-Control-Expose-Headers": "Content-Range",
+        }
+    })
 }
 
 export async function POST(request: NextRequest) {
