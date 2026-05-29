@@ -119,13 +119,13 @@ export default function SpeakerForm({
                 </div>
 
                 {links.map((link, i) => (
-                    <div key={i} className="flex gap-2 mb-2">
+                    <div key={i} className="flex flex-col sm:flex-row gap-2 mb-2">
                         <input
                             type="text"
                             value={link.label}
                             onChange={(e) => updateLink(i, "label", e.target.value)}
                             placeholder="Label (ex: LinkedIn)"
-                            className="w-1/3 border rounded-lg px-3 py-2 text-sm"
+                            className="w-full sm:w-1/3 border rounded-lg px-3 py-2 text-sm"
                         />
                         <input
                             type="url"
