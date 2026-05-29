@@ -29,7 +29,16 @@ export default async function SpeakerPage({
         notFound()
     }
 
-    const sessions = speaker.sessions.map(({ session }) => ({
+    type SessionRelation = {
+        id: string
+        title: string
+        startTime: Date
+        endTime: Date
+        room: { name: string }
+        event: { title: string }
+    }
+
+    const sessions = speaker.sessions.map(({ session }: { session: SessionRelation }) => ({
         id: session.id,
         title: session.title,
         startTime: session.startTime.toISOString(),
