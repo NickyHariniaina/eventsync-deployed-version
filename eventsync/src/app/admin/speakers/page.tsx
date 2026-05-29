@@ -14,11 +14,11 @@ export default async function AdminSpeakersPage() {
 
     return (
         <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h1 className="text-2xl font-bold">Intervenants</h1>
                 <Link
                     href="/admin/speakers/new"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm text-center"
                 >
                     + Nouvel intervenant
                 </Link>
