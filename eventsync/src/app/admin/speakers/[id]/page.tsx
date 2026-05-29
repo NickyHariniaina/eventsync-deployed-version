@@ -25,7 +25,7 @@ export default async function EditSpeakerPage({
                     name: speaker.name,
                     photo: speaker.photo,
                     bio: speaker.bio,
-                    links: speaker.links.map((l) => ({ label: l.label, url: l.url })),
+                    links: speaker.links.map((l: { label: string; url: string }) => ({ label: l.label, url: l.url })),
                 }}
             />
         </div>
