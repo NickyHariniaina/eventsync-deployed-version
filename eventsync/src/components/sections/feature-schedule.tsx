@@ -27,8 +27,8 @@ export function FeatureSchedule() {
             Grille temporelle complète avec toutes les sessions simultanées, par salle et par créneau. Ne manquez aucune session grâce à une vue d&apos;ensemble claire.
           </p>
         </div>
-        <div className="overflow-hidden rounded-xl border border-border bg-background/60">
-          <div className="grid grid-cols-4 gap-px bg-border/50 text-xs">
+          <div className="overflow-x-auto rounded-xl border border-border bg-background/60">
+          <div className="min-w-[400px] grid grid-cols-4 gap-px bg-border/50 text-xs">
             <div className="bg-background/80 p-2 font-semibold text-foreground">Horaire</div>
             <div className="bg-background/80 p-2 font-semibold text-foreground">Salle A</div>
             <div className="bg-background/80 p-2 font-semibold text-foreground">Salle B</div>
