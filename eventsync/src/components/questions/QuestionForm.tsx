@@ -60,7 +60,7 @@ export function QuestionForm({ sessionId, onQuestionAdded }: Props) {
           "focus:border-primary focus:ring-2 focus:ring-primary/20"
         )}
       />
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
         <input
           type="text"
           value={author}
