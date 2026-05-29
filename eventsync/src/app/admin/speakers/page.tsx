@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
 
 import DeleteButton from "./DeleteButton"
 
@@ -30,7 +29,7 @@ export default async function AdminSpeakersPage() {
             )}
 
             <ul className="space-y-2">
-                {speakers.map((speaker: Prisma.SpeakerGetPayload<{ include: { _count: { select: { sessions: true } } } }>) => (
+                {speakers.map((speaker: { id: string; name: string; photo: string | null; _count: { sessions: number } }) => (
                     <li
                         key={speaker.id}
                         className="flex items-center justify-between border rounded-lg px-4 py-3"
