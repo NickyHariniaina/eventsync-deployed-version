@@ -32,7 +32,7 @@ export default async function AdminSpeakersPage() {
                 {speakers.map((speaker: { id: string; name: string; photo: string | null; _count: { sessions: number } }) => (
                     <li
                         key={speaker.id}
-                        className="flex items-center justify-between border rounded-lg px-4 py-3"
+                        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border rounded-lg px-4 py-3"
                     >
                         <div className="flex items-center gap-3">
                             {speaker.photo ? (
