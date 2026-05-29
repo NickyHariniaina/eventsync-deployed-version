@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { corsHeaders, corsOptions } from "@/lib/cors"
 
-export async function GET() {
+export async function OPTIONS(request: NextRequest) {
+  return corsOptions(request)
+}
+
+export async function GET(request: NextRequest) {
     const speakers = await prisma.speaker.findMany({
         include: { links: true },
         orderBy: { name: "asc" },
@@ -9,8 +14,8 @@ export async function GET() {
 
     return NextResponse.json(speakers, {
         headers: {
+            ...corsHeaders(request),
             "Content-Range": `speakers 0-${speakers.length}/${speakers.length}`,
-            "Access-Control-Expose-Headers": "Content-Range",
         }
     })
 }
@@ -21,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!body.name) {
         return NextResponse.json(
             { error: "Name is required" },
-            { status: 400 }
+            { status: 400, headers: corsHeaders(request) },
         )
     }
 
@@ -37,5 +42,8 @@ export async function POST(request: NextRequest) {
         include: { links: true },
     })
 
-    return NextResponse.json(speaker, { status: 201 })
+    return NextResponse.json(
+        speaker,
+        { status: 201, headers: corsHeaders(request) },
+    )
 }

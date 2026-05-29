@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { corsHeaders, corsOptions } from "@/lib/cors"
+
+export async function OPTIONS(request: NextRequest) {
+  return corsOptions(request)
+}
 
 export async function GET(
-    _request: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params
@@ -26,11 +31,13 @@ export async function GET(
     if (!speaker) {
         return NextResponse.json(
             { error: "Speaker not found" },
-            { status: 404 }
+            { status: 404, headers: corsHeaders(request) },
         )
     }
 
-    return NextResponse.json(speaker)
+    return NextResponse.json(speaker, {
+        headers: corsHeaders(request),
+    })
 }
 
 export async function PUT(
@@ -43,7 +50,7 @@ export async function PUT(
     if (!body.name) {
         return NextResponse.json(
             { error: "Name is required" },
-            { status: 400 }
+            { status: 400, headers: corsHeaders(request) },
         )
     }
 
@@ -61,11 +68,13 @@ export async function PUT(
         include: { links: true },
     })
 
-    return NextResponse.json(speaker)
+    return NextResponse.json(speaker, {
+        headers: corsHeaders(request),
+    })
 }
 
 export async function DELETE(
-    _request: NextRequest,
+    request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const { id } = await params
@@ -73,5 +82,8 @@ export async function DELETE(
         where: { id },
     })
 
-    return NextResponse.json({ message: "Intervenant supprimé" })
+    return NextResponse.json(
+        { message: "Intervenant supprimé" },
+        { headers: corsHeaders(request) },
+    )
 }

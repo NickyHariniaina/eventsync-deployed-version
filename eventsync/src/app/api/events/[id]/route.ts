@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { createEventSchema } from "@/lib/validators"
+import { corsHeaders, corsOptions } from "@/lib/cors"
+
+export async function OPTIONS(request: NextRequest) {
+  return corsOptions(request)
+}
 
 export async function GET(
   request: NextRequest,
@@ -27,19 +32,19 @@ export async function GET(
     if (!event) {
       return NextResponse.json(
         { error: "Événement non trouvé" },
-        { status: 404 }
+        { status: 404, headers: corsHeaders(request) },
       )
     }
     return NextResponse.json(event, {
       headers: {
+        ...corsHeaders(request),
         "Content-Range": `events 0-1/1`,
-        "Access-Control-Expose-Headers": "Content-Range",
       }
     })
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders(request) },
     )
   }
 }
@@ -53,7 +58,10 @@ export async function PUT(
     headers: request.headers
   })
   if (!session) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
+    return NextResponse.json(
+      { error: "Non autorisé" },
+      { status: 401, headers: corsHeaders(request) },
+    )
   }
 
   try {
@@ -62,7 +70,7 @@ export async function PUT(
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? "Invalid request" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders(request) },
       )
     }
     const event = await prisma.event.update({
@@ -75,11 +83,13 @@ export async function PUT(
         location: parsed.data.location,
       }
     })
-    return NextResponse.json(event)
+    return NextResponse.json(event, {
+      headers: corsHeaders(request),
+    })
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders(request) },
     )
   }
 }
@@ -93,18 +103,24 @@ export async function DELETE(
     headers: request.headers
   })
   if (!session) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
+    return NextResponse.json(
+      { error: "Non autorisé" },
+      { status: 401, headers: corsHeaders(request) },
+    )
   }
 
   try {
     await prisma.event.delete({
       where: { id }
     })
-    return NextResponse.json({ message: "Événement supprimé" })
+    return NextResponse.json(
+      { message: "Événement supprimé" },
+      { headers: corsHeaders(request) },
+    )
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders(request) },
     )
   }
 }

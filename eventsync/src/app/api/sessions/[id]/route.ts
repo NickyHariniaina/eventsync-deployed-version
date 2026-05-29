@@ -3,10 +3,15 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { updateSessionSchema } from "@/lib/validators"
+import { corsHeaders, corsOptions } from "@/lib/cors"
 
 type Params = { params: Promise<{ id: string }> }
 
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function OPTIONS(request: NextRequest) {
+  return corsOptions(request)
+}
+
+export async function GET(request: NextRequest, { params }: Params) {
     try {
         const { id } = await params
 
@@ -26,7 +31,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
         if (!session) {
             return NextResponse.json(
                 { error: "Session non trouvée" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders(request) },
             )
         }
 
@@ -50,14 +55,15 @@ export async function GET(_req: NextRequest, { params }: Params) {
             createdAt: session.createdAt,
             updatedAt: session.updatedAt,
         }, {
-    headers: {
-        "Content-Range": "sessions 0-1/1",
-        "Access-Control-Expose-Headers": "Content-Range",
-    }})
+            headers: {
+                ...corsHeaders(request),
+                "Content-Range": "sessions 0-1/1",
+            }
+        })
     } catch {
         return NextResponse.json(
             { error: "Internal server error" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders(request) },
         )
     }
 }
@@ -66,7 +72,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
     try {
         const authSession = await auth.api.getSession({ headers: await headers() })
         if (!authSession) {
-            return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
+            return NextResponse.json(
+                { error: "Non autorisé" },
+                { status: 401, headers: corsHeaders(req) },
+            )
         }
 
         const { id } = await params
@@ -75,7 +84,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         if (!parsed.success) {
             return NextResponse.json(
                 { error: parsed.error.issues[0]?.message ?? "Invalid request" },
-                { status: 400 }
+                { status: 400, headers: corsHeaders(req) },
             )
         }
 
@@ -85,7 +94,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         if (!existing) {
             return NextResponse.json(
                 { error: "Session non trouvée" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders(req) },
             )
         }
 
@@ -131,27 +140,33 @@ export async function PUT(req: NextRequest, { params }: Params) {
             })),
             createdAt: updated.createdAt,
             updatedAt: updated.updatedAt,
-        })
+        }, { headers: corsHeaders(req) })
     } catch {
         return NextResponse.json(
             { error: "Internal server error" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders(req) },
         )
     }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(request: NextRequest, { params }: Params) {
     try {
         const authSession = await auth.api.getSession({ headers: await headers() })
         if (!authSession) {
-            return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
+            return NextResponse.json(
+                { error: "Non autorisé" },
+                { status: 401, headers: corsHeaders(request) },
+            )
         }
 
         const { id } = await params
 
         await prisma.talkSession.delete({ where: { id } })
 
-        return NextResponse.json({ message: "Session supprimée" })
+        return NextResponse.json(
+            { message: "Session supprimée" },
+            { headers: corsHeaders(request) },
+        )
     } catch (err: unknown) {
         if (
             typeof err === "object" &&
@@ -161,13 +176,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
         ) {
             return NextResponse.json(
                 { error: "Session non trouvée" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders(request) },
             )
         }
 
         return NextResponse.json(
             { error: "Internal server error" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders(request) },
         )
     }
 }
