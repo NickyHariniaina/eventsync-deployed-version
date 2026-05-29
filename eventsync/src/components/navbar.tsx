@@ -23,6 +23,12 @@ export function Navbar() {
           >
             Events
           </Link>
+          <Link
+            href="/favorites"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Favoris
+          </Link>
         </nav>
         <div className="absolute right-4">
           <ThemeToggle />

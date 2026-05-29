@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { LiveBadge } from "./LiveBadge"
 import { isSessionLive } from "@/lib/utils"
+import FavoriteButton from "@/components/favorites/FavoriteButton"
 
 type Speaker = {
     id: string
@@ -32,7 +33,10 @@ export function SessionDetail({ session }: Props) {
         <div>
             <div className="mb-6 flex items-start justify-between gap-4">
                 <h1 className="text-3xl font-bold">{session.title}</h1>
-                <LiveBadge isLive={live} />
+                <div className="flex items-center gap-2 shrink-0">
+                    <FavoriteButton sessionId={session.id} />
+                    <LiveBadge isLive={live} />
+                </div>
             </div>
 
             <div className="mb-6 flex flex-wrap gap-4 text-sm text-gray-600">
