@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET(
     _request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const speaker = await prisma.speaker.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             links: true,
             sessions: {
@@ -34,8 +35,9 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const body = await request.json()
 
     if (!body.name) {
@@ -46,7 +48,7 @@ export async function PUT(
     }
 
     const speaker = await prisma.speaker.update({
-        where: { id: params.id },
+        where: { id },
         data: {
             name: body.name,
             photo: body.photo || null,
@@ -64,10 +66,11 @@ export async function PUT(
 
 export async function DELETE(
     _request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     await prisma.speaker.delete({
-        where: { id: params.id },
+        where: { id },
     })
 
     return NextResponse.json({ message: "Intervenant supprimé" })
