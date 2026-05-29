@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import cloudinary from "@/lib/cloudinary"
-
-function corsHeaders(request: NextRequest): Headers {
-  const headers = new Headers()
-  const origin = request.headers.get("origin") || ""
-  if (origin.startsWith("http://localhost:") || origin.startsWith("https://localhost:")) {
-    headers.set("Access-Control-Allow-Origin", origin)
-  }
-  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
-  headers.set("Access-Control-Allow-Headers", "Content-Type")
-  headers.set("Access-Control-Allow-Credentials", "true")
-  return headers
-}
+import { corsHeaders, corsOptions } from "@/lib/cors"
 
 export async function OPTIONS(request: NextRequest) {
-  return NextResponse.json(null, { headers: corsHeaders(request) })
+  return corsOptions(request)
 }
 
 export async function POST(request: NextRequest) {
