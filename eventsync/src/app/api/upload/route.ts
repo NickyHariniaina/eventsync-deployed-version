@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import cloudinary from "@/lib/cloudinary"
 
-function corsHeaders(request: NextRequest) {
+function corsHeaders(request: NextRequest): Headers {
+  const headers = new Headers()
   const origin = request.headers.get("origin") || ""
-  // Allow localhost origins in development
   if (origin.startsWith("http://localhost:") || origin.startsWith("https://localhost:")) {
-    return {
-      "Access-Control-Allow-Origin": origin,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Credentials": "true",
-    }
+    headers.set("Access-Control-Allow-Origin", origin)
   }
-  return {}
+  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
+  headers.set("Access-Control-Allow-Headers", "Content-Type")
+  headers.set("Access-Control-Allow-Credentials", "true")
+  return headers
 }
 
 export async function OPTIONS(request: NextRequest) {
