@@ -79,7 +79,7 @@ export default function SpeakerProfile({ name, photo, bio, links, sessions }: Pr
                             return (
                                 <li key={session.id}>
                                     <div className="border rounded-lg p-3">
-                                        <div className="flex items-center justify-between mb-1">
+                                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1">
                                             <Link
                                                 href={`/sessions/${session.id}`}
                                                 className="font-medium hover:underline"
